@@ -1,0 +1,14 @@
+pip
+wheel
+heroku3>=3.4.0
+httplib2>=0.18.0
+psycopg2-binary
+python-dotenv
+# requests>=2.18.4
+sqlalchemy
+telethon
+telethon-session-sqlalchemy>=0.2.6
+# python-dateutil
+spotipy
+apscheduler
+ 
