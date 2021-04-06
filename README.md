@@ -18,6 +18,7 @@ Example of how posts will look like can be seen [here](https://t.me/d3athwarrior
 ### Planned
 
 1. Allow for republishing after 'x' number of days which will be configurable  
+2. Provide a configurable option to publish a song only when a user has listened to it for more than the configured time. (The logic here is that for someone to really decide whether they like a song or not it takes at least a few seconds 10, 15 or even more and in this time some may not prefer to really publish this song)  
 
 ### Open verification points
 
