@@ -11,4 +11,4 @@ telethon-session-sqlalchemy>=0.2.6
 # python-dateutil
 spotipy
 apscheduler
- 
+cryptg 

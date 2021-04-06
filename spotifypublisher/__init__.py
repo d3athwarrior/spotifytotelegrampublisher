@@ -46,6 +46,15 @@ SPOTIFY_LIST_CHAT_ID=os.environ.get('SPOTIFY_LIST_CHAT_ID', '')
 # The delay (in seconds) with which the spotify api should be queried
 SPOTIFY_QUERY_DELAY=int(os.environ.get('SPOTIFY_QUERY_DELAY', ''))
 
+# The time (in seconds) to let a song play before publishing it
+SPOTIFY_PLAY_TIME_BEFORE_PUBLISH=int(os.environ.get('SPOTIFY_PLAY_TIME_BEFORE_PUBLISH', 45))
+
+# The % of the song to be played before publishing it. Default is 25%.
+# SPOTIFY_PLAY_TIME_PERCENT_BEFORE_PUBLISH=float(os.environ.get('SPOTIFY_PLAY_TIME_PERCENT_BEFORE_PUBLISH', 25))
+
+# The time (in hours) to let a song play before publishing it. Default is 120 hours
+SPOTIFY_TIME_BEFORE_REPUBLISH_SECONDS=int(os.environ.get('SPOTIFY_TIME_BEFORE_REPUBLISH', 120)) * 60 * 60
+
 BOT = None
 if (STRING_SESSION not in ('', None) and API_KEY not in ('', None) and API_HASH not in ('', None) 
     and SPOTIFY_USERNAME not in (None, "") and SPOTIFY_CLIENT_ID not in (None, "")
