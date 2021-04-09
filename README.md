@@ -7,7 +7,7 @@ Made using [Telethon](https://github.com/LonamiWebs/Telethon), [Spotipy](https:/
 
 This can be customized and integrated into a telegram userbot(use userbots at your own risk) example is available [here](https://github.com/d3athwarrior/userbot).
 
-Example of how posts will look like can be seen [here](https://t.me/d3athwarriorsmusic)
+Example of how posts will look like can be seen [here](https://t.me/d3athwarriorsden)
 
 ## Features
 
