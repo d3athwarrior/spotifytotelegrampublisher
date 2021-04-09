@@ -1,21 +1,34 @@
 # from userbot.modules.sql_helper.spotifypublished import is_song_published, publish_song
-from datetime import date, datetime
 import os
+from datetime import date, datetime
 
 import requests
-from sqlalchemy.sql.functions import now
-from database.spotifypublished import SpotifyPlayed, is_song_published, publish_song
-from spotipy import Spotify, util
-from spotifypublisher import BOT, LOGS, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_LIST_CHAT_ID, SPOTIFY_PLAY_TIME_BEFORE_PUBLISH, SPOTIFY_QUERY_DELAY, SPOTIFY_TIME_BEFORE_REPUBLISH_SECONDS, SPOTIFY_USERNAME
-from spotipy.exceptions import SpotifyException
-from telethon.client.telegramclient import TelegramClient
-from telethon.sessions.string import StringSession
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from database.spotifypublished import (SpotifyPlayed, is_song_published,
+                                       publish_song)
+from spotipy import Spotify, util
+from spotipy.exceptions import SpotifyException
+from sqlalchemy.sql.functions import now
+from telethon.client.telegramclient import TelegramClient
+from telethon.errors.rpcbaseerrors import BadRequestError
+from telethon.sessions.string import StringSession
 
+from spotifypublisher import (BOT, LOGS, SPOTIFY_CLIENT_ID,
+                              SPOTIFY_CLIENT_SECRET, SPOTIFY_LIST_CHAT_ID,
+                              SPOTIFY_PLAY_TIME_BEFORE_PUBLISH,
+                              SPOTIFY_QUERY_DELAY,
+                              SPOTIFY_TIME_BEFORE_REPUBLISH_SECONDS,
+                              SPOTIFY_USERNAME)
+# instance of the spotify client object
 spotify_client = None
+
+# dict to hold the detail of a song temporarily until the timer to publish a song has completed
 song_publish_grace_detail: dict = dict()
 
 def authenticateSpotify():
+    """
+        Authenticate spotify user account and store it for use throughout the lifecycle of the script
+    """
     global spotify_client
     try:
         token = util.prompt_for_user_token(username=SPOTIFY_USERNAME,
@@ -29,6 +42,12 @@ def authenticateSpotify():
     spotify_client = Spotify(auth=token)
 
 async def queryNowPlaying():
+    """
+        Query spotify for the uses now playing songs and publish it to the channel specified in the 
+        configuration file.
+        The song that is played is also stored in the database along with a timestamp so that it can be
+        republished later after a specified interval of time has elapsed
+    """
     global spotify_client
     global song_publish_grace_detail
     album: str = None
@@ -45,8 +64,11 @@ async def queryNowPlaying():
         results = spotify_client.current_playback()
     except SpotifyException as ex:
         LOGS.error("Spotify Error: " + ex.msg)
+        # If any kind of exception, re-authenticate. This feels dumb to me but will fix it once
+        # i figure out how to deal with the exception that is thrown when the authentication has expired
         authenticateSpotify()
         results = spotify_client.current_playback()
+    # If there are no songs being played, don't try to publish empty items
     if (results != None):
         song = str(results['item']['name'])
         album = str(results['item']['album']['name'])
@@ -80,9 +102,12 @@ async def queryNowPlaying():
             else:
                 publish_song(song_detail=song_detail)
             open('image.png', 'wb').write(requests.get(url=album_art_URL).content)
-            await BOT.send_file(SPOTIFY_LIST_CHAT_ID, file = 'image.png', caption=message_body +
+            try:
+                await BOT.send_file(SPOTIFY_LIST_CHAT_ID, file = 'image.png', caption=message_body +
                                         '\n\n<a href="' + browser_link + '">Open Browser Link</a>' +
                                         '\n<a href="' + mobile_link + '">Open Mobile Link</a>', parse_mode='html')
+            except BadRequestError as ex:
+                LOGS.error("Error in publishing song to the specified chat. Error is: " + ex.message)
             
             song_publish_grace_detail.pop(song+album+artist)
             
