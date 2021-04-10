@@ -5,13 +5,9 @@ from spotifypublisher import DB_URI
 
 BASE = declarative_base()
 
+engine = create_engine(DB_URI)
+BASE.metadata.bind = engine
+BASE.metadata.create_all(engine)
 
-def start() -> scoped_session:
-    engine = create_engine(DB_URI)
-    BASE.metadata.bind = engine
-    BASE.metadata.create_all(engine)
-    return scoped_session(sessionmaker(bind=engine, autoflush=False))
-
-
-SESSION = start()
+SESSION : scoped_session = scoped_session(sessionmaker(bind=engine, autoflush=False))
  

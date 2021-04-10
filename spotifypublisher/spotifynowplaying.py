@@ -1,6 +1,5 @@
-# from userbot.modules.sql_helper.spotifypublished import is_song_published, publish_song
 import os
-from datetime import date, datetime
+from datetime import datetime
 
 import requests
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -19,13 +18,14 @@ from spotifypublisher import (BOT, LOGS, SPOTIFY_CLIENT_ID,
                               SPOTIFY_QUERY_DELAY,
                               SPOTIFY_TIME_BEFORE_REPUBLISH_SECONDS,
                               SPOTIFY_USERNAME)
+
 # instance of the spotify client object
 spotify_client = None
 
 # dict to hold the detail of a song temporarily until the timer to publish a song has completed
 song_publish_grace_detail: dict = dict()
 
-def authenticateSpotify():
+def authenticate_spotify():
     """
         Authenticate spotify user account and store it for use throughout the lifecycle of the script
     """
@@ -41,7 +41,7 @@ def authenticateSpotify():
 
     spotify_client = Spotify(auth=token)
 
-async def queryNowPlaying():
+async def query_now_playing():
     """
         Query spotify for the uses now playing songs and publish it to the channel specified in the 
         configuration file.
@@ -60,16 +60,16 @@ async def queryNowPlaying():
     try:
         results = None
         if spotify_client == None:
-            authenticateSpotify()
+            authenticate_spotify()
         results = spotify_client.current_playback()
     except SpotifyException as ex:
         LOGS.error("Spotify Error: " + ex.msg)
         # If any kind of exception, re-authenticate. This feels dumb to me but will fix it once
         # i figure out how to deal with the exception that is thrown when the authentication has expired
-        authenticateSpotify()
+        authenticate_spotify()
         results = spotify_client.current_playback()
     # If there are no songs being played, don't try to publish empty items
-    if (results != None):
+    if results is not None:
         song = str(results['item']['name'])
         album = str(results['item']['album']['name'])
 
@@ -84,12 +84,12 @@ async def queryNowPlaying():
                 album_art_URL = album_art_detail['url']
 
         song_detail = is_song_published(song, album, artist)
-        if (not song+album+artist in song_publish_grace_detail.keys()):
+        if song+album+artist not in song_publish_grace_detail.keys():
             song_publish_grace_detail[song+album+artist] = datetime.now()
         
         publish_grace_time_elapsed = (datetime.now() - song_publish_grace_detail[song+album+artist]).total_seconds()
 
-        if ((song_detail == None) and publish_grace_time_elapsed > SPOTIFY_PLAY_TIME_BEFORE_PUBLISH):
+        if song_detail is None and publish_grace_time_elapsed > SPOTIFY_PLAY_TIME_BEFORE_PUBLISH:
             # Republish after grace time is still broken. Due to the nature of SQL and the threads being executed concurrently, the songs are being published
             # twice. This is an issue.
             # if ((song_detail == None or __republish_grace_time_elapsed(song_detail)) and publish_grace_time_elapsed > SPOTIFY_PLAY_TIME_BEFORE_PUBLISH):
@@ -113,12 +113,12 @@ async def queryNowPlaying():
             
             os.remove('image.png')
 
-def __republish_grace_time_elapsed(song_details: SpotifyPlayed) -> bool:
+def _republish_grace_time_elapsed(song_details: SpotifyPlayed) -> bool:
     """
         Function to check if a song has been played for the configured time
     """
     return (datetime.now() - song_details.last_played).total_seconds() > SPOTIFY_TIME_BEFORE_REPUBLISH_SECONDS
 
 scheduler = AsyncIOScheduler()
-scheduler.add_job(queryNowPlaying, 'interval', seconds=SPOTIFY_QUERY_DELAY, misfire_grace_time=4, coalesce=True)
+scheduler.add_job(query_now_playing, 'interval', seconds=SPOTIFY_QUERY_DELAY, misfire_grace_time=4, coalesce=True)
 scheduler.start()
