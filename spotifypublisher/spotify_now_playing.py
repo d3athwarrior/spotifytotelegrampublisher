@@ -85,6 +85,7 @@ async def query_now_playing():
 
         song_detail = is_song_published(song, album, artist)
         if song+album+artist not in song_publish_grace_detail.keys():
+            song_publish_grace_detail.clear()
             song_publish_grace_detail[song+album+artist] = datetime.now()
         
         publish_grace_time_elapsed = (datetime.now() - song_publish_grace_detail[song+album+artist]).total_seconds()
