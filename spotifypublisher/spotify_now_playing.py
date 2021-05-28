@@ -14,7 +14,7 @@ from telethon.sessions.string import StringSession
 
 from spotifypublisher import (BOT, LOGS, SPOTIFY_CLIENT_ID,
                               SPOTIFY_CLIENT_SECRET, SPOTIFY_LIST_CHAT_ID,
-                              SPOTIFY_PLAY_TIME_BEFORE_PUBLISH,
+                              SPOTIFY_PLAY_TIME_BEFORE_PUBLISH, SPOTIFY_PUBLISH_SILENTLY,
                               SPOTIFY_QUERY_DELAY,
                               SPOTIFY_TIME_BEFORE_REPUBLISH_SECONDS,
                               SPOTIFY_USERNAME)
@@ -106,7 +106,7 @@ async def query_now_playing():
             try:
                 await BOT.send_file(SPOTIFY_LIST_CHAT_ID, file = 'image.png', caption=message_body +
                                         '\n\n<a href="' + browser_link + '">Open Browser Link</a>' +
-                                        '\n<a href="' + mobile_link + '">Open Mobile Link</a>', parse_mode='html')
+                                        '\n<a href="' + mobile_link + '">Open Mobile Link</a>', parse_mode='html', silent=SPOTIFY_PUBLISH_SILENTLY)
             except BadRequestError as ex:
                 LOGS.error("Error in publishing song to the specified chat. Error is: " + ex.message)
             

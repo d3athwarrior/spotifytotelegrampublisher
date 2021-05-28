@@ -55,6 +55,9 @@ SPOTIFY_PLAY_TIME_BEFORE_PUBLISH=int(os.environ.get('SPOTIFY_PLAY_TIME_BEFORE_PU
 # The time (in hours) to let a song play before publishing it. Default is 120 hours
 SPOTIFY_TIME_BEFORE_REPUBLISH_SECONDS=int(os.environ.get('SPOTIFY_TIME_BEFORE_REPUBLISH', 120)) * 60 * 60
 
+# Whether to publish silently
+SPOTIFY_PUBLISH_SILENTLY = sb(os.environ.get("SPOTIFY_PUBLISH_SILENTLY", "True"))
+
 BOT = None
 if (STRING_SESSION not in ('', None) and API_KEY not in ('', None) and API_HASH not in ('', None) 
     and SPOTIFY_USERNAME not in (None, "") and SPOTIFY_CLIENT_ID not in (None, "")
