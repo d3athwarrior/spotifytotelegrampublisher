@@ -58,6 +58,9 @@ SPOTIFY_TIME_BEFORE_REPUBLISH_SECONDS=int(os.environ.get('SPOTIFY_TIME_BEFORE_RE
 # Whether to publish silently
 SPOTIFY_PUBLISH_SILENTLY = sb(os.environ.get("SPOTIFY_PUBLISH_SILENTLY", "True"))
 
+# Text to add to the post
+SPOTIFY_PUBLISHED_POST_ADDITIONAL_TEXT = os.environ.get("SPOTIFY_PUBLISHED_POST_ADDITIONAL_TEXT", "")
+
 BOT = None
 if (STRING_SESSION not in ('', None) and API_KEY not in ('', None) and API_HASH not in ('', None) 
     and SPOTIFY_USERNAME not in (None, "") and SPOTIFY_CLIENT_ID not in (None, "")

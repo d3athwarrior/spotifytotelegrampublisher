@@ -3,7 +3,7 @@ from datetime import datetime
 
 import requests
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from database.spotifypublished import (SpotifyPlayed, is_song_published,
+from database.spotify_published import (SpotifyPlayed, is_song_published,
                                        publish_song)
 from spotipy import Spotify, util
 from spotipy.exceptions import SpotifyException
@@ -14,7 +14,7 @@ from telethon.sessions.string import StringSession
 
 from spotifypublisher import (BOT, LOGS, SPOTIFY_CLIENT_ID,
                               SPOTIFY_CLIENT_SECRET, SPOTIFY_LIST_CHAT_ID,
-                              SPOTIFY_PLAY_TIME_BEFORE_PUBLISH, SPOTIFY_PUBLISH_SILENTLY,
+                              SPOTIFY_PLAY_TIME_BEFORE_PUBLISH, SPOTIFY_PUBLISHED_POST_ADDITIONAL_TEXT, SPOTIFY_PUBLISH_SILENTLY,
                               SPOTIFY_QUERY_DELAY,
                               SPOTIFY_TIME_BEFORE_REPUBLISH_SECONDS,
                               SPOTIFY_USERNAME)
@@ -94,7 +94,7 @@ async def query_now_playing():
             # Republish after grace time is still broken. Due to the nature of SQL and the threads being executed concurrently, the songs are being published
             # twice. This is an issue.
             # if ((song_detail == None or __republish_grace_time_elapsed(song_detail)) and publish_grace_time_elapsed > SPOTIFY_PLAY_TIME_BEFORE_PUBLISH):
-            message_body = '<strong>Song     : </strong>' + song + '\n<strong>Album  : </strong>' + album + '\n<strong>Artist    : </strong>' + artist
+            message_body = '<strong>Song     : </strong>' + song + '\n<strong>Album  : </strong>' + album + '\n<strong>Artist    : </strong>' + artist + '\n\n' + SPOTIFY_PUBLISHED_POST_ADDITIONAL_TEXT
             browser_link = str(results['item']['album']['external_urls']['spotify']) + '?highlight=' + str(results['item']['uri'])
             mobile_link = str(results['item']['external_urls']['spotify'])
             LOGS.info("Publishing: " + message_body)
